@@ -10,12 +10,19 @@
   <div class="container">
     <h1>Skladište – Barkod Skener</h1>
 
+    <!-- Gumb za inventory -->
+    <a href="inventory.html">
+      <button id="inventoryBtn">Pogledaj zalihe</button>
+    </a>
+
+    <!-- Kamera i unos barkoda -->
     <div class="scanner">
       <video id="video" width="300" height="200" style="border:1px solid #ccc;"></video>
       <input type="text" id="barkodInput" placeholder="ili unesi barkod ručno">
       <button id="scanBtn">Pretraži</button>
     </div>
 
+    <!-- Prikaz proizvoda -->
     <div id="productInfo" class="hidden">
       <p><strong>Naziv:</strong> <span id="naziv"></span></p>
       <p><strong>Količina:</strong> <span id="kolicina"></span></p>
@@ -23,6 +30,7 @@
       <button id="removeBtn">- Oduzmi</button>
     </div>
 
+    <!-- Forma za dodavanje novog proizvoda -->
     <div class="add-product">
       <h2>Dodaj novi proizvod</h2>
       <input type="text" id="newBarkod" placeholder="Barkod">
@@ -34,6 +42,7 @@
     <div id="message"></div>
   </div>
 
+  <!-- html5-qrcode za kameru -->
   <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
   <script src="script.js"></script>
 </body>
