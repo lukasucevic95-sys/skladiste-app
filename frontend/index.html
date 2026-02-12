@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skladište</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Skladište – Barkod Skener</h1>
+
+    <div class="scanner">
+      <input type="text" id="barkodInput" placeholder="Skeniraj barkod">
+      <button id="scanBtn">Pretraži</button>
+    </div>
+
+    <div id="productInfo" class="hidden">
+      <p><strong>Naziv:</strong> <span id="naziv"></span></p>
+      <p><strong>Količina:</strong> <span id="kolicina"></span></p>
+      <button id="addBtn">+ Dodaj</button>
+      <button id="removeBtn">- Oduzmi</button>
+    </div>
+
+    <div id="message"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
