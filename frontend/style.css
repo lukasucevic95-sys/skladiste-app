@@ -7,7 +7,7 @@ body {
 
 .container {
   max-width: 400px;
-  margin: 50px auto;
+  margin: 30px auto;
   background: white;
   padding: 20px;
   border-radius: 12px;
@@ -16,9 +16,14 @@ body {
 
 .hidden { display: none; }
 
+input, button {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  box-sizing: border-box;
+}
+
 button {
-  padding: 10px 15px;
-  margin: 5px;
   border: none;
   border-radius: 8px;
   background: #4CAF50;
