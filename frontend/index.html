@@ -10,7 +10,7 @@
   <div class="container">
     <h1>Skladište – Barkod Skener</h1>
 
-    <!-- Gumb za Inventory -->
+    <!-- Gumb za inventory -->
     <a href="inventory.html">
       <button id="inventoryBtn">Pogledaj zalihe</button>
     </a>
@@ -42,8 +42,164 @@
     <div id="message"></div>
   </div>
 
-  <!-- html5-qrcode za kameru -->
   <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
-  <script src="script.js"></script>
+  <script>
+    const API_URL = "https://skladiste-app-production.up.railway.app";
+    const TOKEN = "tvoj-token"; // stavi svoj token
+
+    // JSON s početnim proizvodima
+    const initialProducts = [
+      { "barkod": "123456789012", "naziv": "Jogurt 1L", "kolicina": 20 },
+      { "barkod": "234567890123", "naziv": "Mlijeko 2L", "kolicina": 15 },
+      { "barkod": "345678901234", "naziv": "Kruh bijeli", "kolicina": 50 },
+      { "barkod": "456789012345", "naziv": "Jaja 10 kom", "kolicina": 30 },
+      { "barkod": "567890123456", "naziv": "Maslac 250g", "kolicina": 25 },
+      { "barkod": "678901234567", "naziv": "Sir Gauda 1kg", "kolicina": 10 },
+      { "barkod": "789012345678", "naziv": "Kava 500g", "kolicina": 40 },
+      { "barkod": "890123456789", "naziv": "Šećer 1kg", "kolicina": 35 },
+      { "barkod": "901234567890", "naziv": "Sol 500g", "kolicina": 45 },
+      { "barkod": "012345678901", "naziv": "Ulje suncokret 1L", "kolicina": 50 }
+    ];
+
+    // Funkcija koja dodaje proizvode u backend
+    async function addInitialProducts() {
+      for (let p of initialProducts) {
+        try {
+          await fetch(`${API_URL}/product`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${TOKEN}`
+            },
+            body: JSON.stringify(p)
+          });
+        } catch(e) {
+          console.log("Greška pri dodavanju proizvoda:", p.barkod);
+        }
+      }
+    }
+
+    // Pokreni samo jednom prilikom učitavanja
+    addInitialProducts();
+
+    // ELEMENTI
+    const barkodInput = document.getElementById("barkodInput");
+    const scanBtn = document.getElementById("scanBtn");
+    const productInfo = document.getElementById("productInfo");
+    const nazivEl = document.getElementById("naziv");
+    const kolicinaEl = document.getElementById("kolicina");
+    const addBtn = document.getElementById("addBtn");
+    const removeBtn = document.getElementById("removeBtn");
+    const messageEl = document.getElementById("message");
+
+    const newBarkod = document.getElementById("newBarkod");
+    const newNaziv = document.getElementById("newNaziv");
+    const newKolicina = document.getElementById("newKolicina");
+    const addProductBtn = document.getElementById("addProductBtn");
+
+    let currentBarkod = "";
+
+    // Kamera i barkod
+    const html5QrCode = new Html5Qrcode("video");
+
+    Html5Qrcode.getCameras().then(cameras => {
+      if (cameras && cameras.length) {
+        html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: 250 },
+          decodedText => {
+            barkodInput.value = decodedText;
+            scanBtn.click();
+          },
+          errorMessage => {}
+        );
+      }
+    }).catch(err => console.error(err));
+
+    // Pretraži barkod
+    scanBtn.addEventListener("click", async () => {
+      const barkod = barkodInput.value.trim();
+      if (!barkod) return;
+
+      const res = await fetch(`${API_URL}/product/${barkod}`, {
+        headers: { Authorization: `Bearer ${TOKEN}` }
+      });
+      const data = await res.json();
+
+      if (!data.postoji) {
+        productInfo.classList.add("hidden");
+        messageEl.innerText = "Proizvod ne postoji!";
+        return;
+      }
+
+      currentBarkod = barkod;
+      nazivEl.innerText = data.naziv || "N/A";
+      kolicinaEl.innerText = data.kolicina;
+      productInfo.classList.remove("hidden");
+      messageEl.innerText = "";
+    });
+
+    // Dodaj količinu
+    addBtn.addEventListener("click", async () => {
+      if (!currentBarkod) return;
+      const res = await fetch(`${API_URL}/move`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`
+        },
+        body: JSON.stringify({ barkod: currentBarkod, delta: 1 })
+      });
+      const data = await res.json();
+      kolicinaEl.innerText = data.kolicina;
+    });
+
+    // Oduzmi količinu
+    removeBtn.addEventListener("click", async () => {
+      if (!currentBarkod) return;
+      const res = await fetch(`${API_URL}/move`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`
+        },
+        body: JSON.stringify({ barkod: currentBarkod, delta: -1 })
+      });
+      const data = await res.json();
+      kolicinaEl.innerText = data.kolicina;
+    });
+
+    // Dodaj novi proizvod
+    addProductBtn.addEventListener("click", async () => {
+      const barkod = newBarkod.value.trim();
+      const naziv = newNaziv.value.trim();
+      const kolicina = parseInt(newKolicina.value);
+
+      if (!barkod || !naziv || isNaN(kolicina)) {
+        messageEl.innerText = "Popuni sve podatke!";
+        return;
+      }
+
+      const res = await fetch(`${API_URL}/product`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`
+        },
+        body: JSON.stringify({ barkod, naziv, kolicina })
+      });
+
+      const data = await res.json();
+      if (data.uspjeh) {
+        messageEl.innerText = "Proizvod dodan!";
+        newBarkod.value = "";
+        newNaziv.value = "";
+        newKolicina.value = "";
+      } else {
+        messageEl.innerText = "Greška pri dodavanju!";
+      }
+    });
+
+  </script>
 </body>
 </html>
