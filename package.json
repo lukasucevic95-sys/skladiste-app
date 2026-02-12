@@ -1,6 +1,9 @@
 {
   "name": "skladiste-backend",
   "version": "1.0.0",
+  "engines": {
+  "node": "20.x"
+}
   "type": "module",
   "scripts": {
     "start": "node server.js"
@@ -12,4 +15,5 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.5"
   }
+
 }
