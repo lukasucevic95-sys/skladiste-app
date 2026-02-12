@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skladište</title>
+  <title>Skladište – Barkod Skener</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,7 +11,8 @@
     <h1>Skladište – Barkod Skener</h1>
 
     <div class="scanner">
-      <input type="text" id="barkodInput" placeholder="Skeniraj barkod">
+      <video id="video" width="300" height="200" style="border:1px solid #ccc;"></video>
+      <input type="text" id="barkodInput" placeholder="ili unesi barkod ručno">
       <button id="scanBtn">Pretraži</button>
     </div>
 
@@ -22,9 +23,18 @@
       <button id="removeBtn">- Oduzmi</button>
     </div>
 
+    <div class="add-product">
+      <h2>Dodaj novi proizvod</h2>
+      <input type="text" id="newBarkod" placeholder="Barkod">
+      <input type="text" id="newNaziv" placeholder="Naziv">
+      <input type="number" id="newKolicina" placeholder="Početna količina">
+      <button id="addProductBtn">Dodaj proizvod</button>
+    </div>
+
     <div id="message"></div>
   </div>
 
+  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
